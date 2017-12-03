@@ -5,7 +5,7 @@ import synapses
 from neurons import Izh_Neuron, LIF_Neuron
 
 
-def two_neurons():
+def two_neurons(w):
     """
     Define 2 neurons, give them input, and see how they behave:
     """
@@ -14,7 +14,7 @@ def two_neurons():
     nrn2 = LIF_Neuron()
 
     # define an input:
-    clamp = synapses.Continuous_synapse(w = .75, onset = 200, offset = 650)
+    clamp = synapses.Continuous_synapse(w = w, onset = 200, offset = 650)
     # connect the input to the neurons:
     nrn1.add_synapse(clamp)
     nrn2.add_synapse(clamp)
@@ -52,7 +52,49 @@ def two_neurons():
     return
 
 def two_neurons_poiss():
-    # ... your code goes here ...
+    """
+    Define 2 neurons, give them input, and see how they behave:
+    """
+    # construct 2 neurons with default settings:
+    nrn1 = Izh_Neuron()
+    nrn2 = LIF_Neuron()
+
+    # define an input:
+    poiss = synapses.Poisson_synapse(firing_rate = 0.5 , w = 0.2 , onset = 200 , offset = 650)
+    # connect the input to the neurons:
+    nrn1.add_synapse(poiss)
+    nrn2.add_synapse(poiss)
+
+    # managing Time, and temporal resolution of the simulation:    
+    T = 800  # ms
+    dt = 1.0 # ms
+    ntsteps = int(T // dt)
+
+    # init arrays for recording synapses and neurons:
+    Ii = np.zeros(( 1, ntsteps )) # 1 input x T/dt time-steps
+    Vv = np.zeros(( 2, ntsteps )) # 2 neurons x T/dt time-steps
+    # run the model, for each timestep
+
+    # define total time and timestep
+    idx = 0
+    for idx,t in enumerate( np.linspace(start=0, stop=T, num=ntsteps) ):
+        # update synapse, and store I_out()
+        poiss.time_step(t, dt)
+        Ii[0, idx] = poiss.I_out()
+        
+        # update neurons
+        nrn1.step(dt)
+        nrn2.step(dt)
+
+        # Store V's
+        Vv[0, idx] = nrn1.get_V()
+        Vv[1, idx] = nrn2.get_V()
+        idx+=1
+
+    plt.plot(Vv.T) # .T transpose, plots 2 lines in 1 command once
+    # OR:
+    #plt.plot(Ii.T)
+    plt.show()
     return
 
 def izh_tester(izh_type = 'A'):
@@ -103,7 +145,7 @@ def connecting_neurons():
 
     
     # construct 2 neurons:
-    nrn1 = Izh_Neuron()
+    nrn1 = Izh_Neuron(izh_type = 'A')
     nrn2 = LIF_Neuron()
 
 
@@ -146,7 +188,9 @@ def connecting_neurons():
 
 
 if __name__ == '__main__':
-    two_neurons()
-    # izh_tester()
-    # two_neurons_poiss()
-    # connecting_neurons()
+    #for w in [0.1, 0.25, 0.5, 0.75, 1.5]:
+    #    two_neurons(w)
+    #for t in ['A', 'B', 'C', 'D', 'E', 'F']:
+    #  izh_tester(t)
+    #two_neurons_poiss()
+    connecting_neurons()
