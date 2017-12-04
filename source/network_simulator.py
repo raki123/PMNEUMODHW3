@@ -165,7 +165,7 @@ if __name__ == '__main__':
 	simulator = Network_simulator(nws)
 
 	# run a bunch of simulatons:
-	simulator.simulate(n_iter=5, trial_im=False, 
+	simulator.simulate(n_iter=50, trial_im=False, 
 						trial_trace=False, rug_plot=True)
 
 	# print the results:

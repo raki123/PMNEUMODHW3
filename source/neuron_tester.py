@@ -145,7 +145,9 @@ def connecting_neurons():
 
     
     # construct 2 neurons:
-    nrn1 = Izh_Neuron(izh_type = 'A')
+    nrna = Izh_Neuron(izh_type = 'A')
+    nrnb = Izh_Neuron(izh_type = 'A')
+    nrnc = Izh_Neuron(izh_type = 'A')
     nrn2 = LIF_Neuron()
 
 
@@ -154,11 +156,18 @@ def connecting_neurons():
         firing_rate = 0.40, w = 0.45, onset = 200, offset = 650)
     
     # wiring:
-    nrn1.add_synapse(poiss)
-    n1n2 = synapses.Neuronal_synapse(pre = nrn1, w = 3.0)
-    nrn2.add_synapse(n1n2)
+    nrna.add_synapse(poiss)
+    nrnb.add_synapse(poiss)
+    nrnc.add_synapse(poiss)
+    nan2 = synapses.Neuronal_synapse(pre = nrna, w = 3.0)
+    nbn2 = synapses.Neuronal_synapse(pre = nrnb, w = 3.0)
+    ncn2 = synapses.Neuronal_synapse(pre = nrnc, w = 3.0)
+    nrn2.add_synapse(nan2)
+    nrn2.add_synapse(nbn2)
+    nrn2.add_synapse(ncn2)
     
     # init arrays for recording:
+    # only store one of the outputs of the Izh-Neurons of type A since they should behave similarly
     Ii = np.zeros(( 2, ntsteps)) # 2 inputs
     Vv = np.zeros(( 2, ntsteps)) # 2 neurons
     
@@ -166,17 +175,21 @@ def connecting_neurons():
     for t in np.linspace(start=0, stop=T, num=ntsteps):
         # update synapse, and store I_out()
         poiss.time_step(t, dt)
-        n1n2.time_step(t, dt)
+        nan2.time_step(t, dt)
+        nbn2.time_step(t, dt)
+        ncn2.time_step(t, dt)
 
         Ii[0, idx] = poiss.I_out()
-        Ii[1, idx] = n1n2.I_out()
+        Ii[1, idx] = nan2.I_out()
         
         # update neurons
-        nrn1.step(dt)
+        nrna.step(dt)
+        nrnb.step(dt)
+        nrnc.step(dt)
         nrn2.step(dt)
 
         # Store V's
-        Vv[0, idx] = nrn1.get_V()
+        Vv[0, idx] = nrna.get_V()
         Vv[1, idx] = nrn2.get_V()
         idx+=1
 

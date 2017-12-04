@@ -20,40 +20,56 @@ So, the input synapses and the output nodes are already listed and accessible
 For a cheatsheet of how to define neuron/synapse types and functions, see below
 """
 
-#### EXAMPLE 1 :
-# define neurons;
-# a = Izh_Neuron()
-# b = Izh_Neuron(izh_type = 'C')
+### EXAMPLE 1 :
+##define neurons;
+#a = Izh_Neuron()
+#b = Izh_Neuron(izh_type = 'C')
+#
+## define a synapse;
+#syn_ab = Neuronal_synapse(w = 3.5, pre = a, post = [b])
+#
+## We want to see the neuron's behavior:
+#a.set_record('Neuron A - Izh type A')
+#b.set_record('Neuron B - Izh type C')
+## and what is happening at the output of interest:
+#out0.set_record('Output 0')
+#out1.set_record('Output 1')
+#
+#
+## add them to the nodes/synapses
+#nodes += [a,b]
+#synapses += [syn_ab]
+### END OF EXAMPLE 1
 
-# # define a synapse;
-# syn_ab = Neuronal_synapse(w = 3.5, pre = a, post = [b])
+## EXAMPLE 2:
+#generate 20 Izh neurons:
+lyr = []
+for i in xrange(20):
+	# generate neuron ... with in0 as input and out0 as output
+	n = Izh_Neuron( syn_in=[in0] )
+	n.set_record(name='', record=False) # name is not important
+	s = Neuronal_synapse(w = 1.8,pre=n,post= out0 )
+	#add node to lyr:
+	lyr += [n]
 
-# # We want to see the neuron's behavior:
-# a.set_record('Neuron A - Izh type A')
-# b.set_record('Neuron B - Izh type C')
-# # and what is happening at the output of interest:
-# out0.set_record('Output 0')
-# out1.set_record('Output 1')
+	#add some noise to the output node out0
+	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
+	out0.add_synapse(syn=[noise])
 
 
-# # add them to the nodes/synapses
-# nodes += [a,b]
-# synapses += [syn_ab]
-#### END OF EXAMPLE 1
+	#generate neuron with in1 as input and out1 as output
+	n = Izh_Neuron( syn_in=[in1] )
+	n.set_record(name='', record=False) # name is not important
+	s = Neuronal_synapse(w = 1.8,pre=n,post= out1 )
+	#add node to lyr:
+	lyr += [n]
 
-#### EXAMPLE 2:
-# generate 20 Izh neurons:
-# lyr = []
-# for i in xrange(20):
-# 	# generate neuron ... with out0 as input
-# 	n = Izh_Neuron( syn_in=[in0] )
-# 	n.set_record(name='', record=True) # name is not important
+	#add some noise to the output node out1
+	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
+	out0.add_synapse(syn=[noise])
 
-# 	#add node to lyr:
-# 	lyr += [n]
-
-# nodes += lyr
-#### END OF EXAMPLE 2
+nodes += lyr
+## END OF EXAMPLE 2
 
 
 """
