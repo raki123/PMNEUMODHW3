@@ -51,10 +51,12 @@ for i in xrange(20):
 	s = Neuronal_synapse(w = 1.8,pre=n,post= out0 )
 	#add node to lyr:
 	lyr += [n]
+	synapses += [s]
 
 	#add some noise to the output node out0
 	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
 	out0.add_synapse(syn=[noise])
+	synapses += [noise]
 
 
 	#generate neuron with in1 as input and out1 as output
@@ -63,10 +65,12 @@ for i in xrange(20):
 	s = Neuronal_synapse(w = 1.8,pre=n,post= out1 )
 	#add node to lyr:
 	lyr += [n]
+	synapses += [s]
 
 	#add some noise to the output node out1
 	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
 	out0.add_synapse(syn=[noise])
+	synapses += [noise]
 
 nodes += lyr
 ## END OF EXAMPLE 2
