@@ -43,32 +43,33 @@ For a cheatsheet of how to define neuron/synapse types and functions, see below
 
 ## EXAMPLE 2:
 #generate 20 Izh neurons:
-lyr = []
+catchfirst0 = Izh_Neuron()
+nodes.append(catchfirst0)
 for i in xrange(20):
-	# generate neuron ... with in0 as input and out0 as output
-	n = Izh_Neuron( syn_in=[in0] )
+        n = Izh_Neuron( syn_in=[in0] )
 	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = 1.8,pre=n,post= out0 )
+	s = Neuronal_synapse(w = -3.0,pre=n,post= catchfirst0 )
 	#add node to lyr:
-	lyr += [n]
+	nodes += [n]
+	synapses += [s]
+        c = Continuous_synapse(w = 0.5)
+	catchfirst0.add_synapse([c])
+        s = Neuronal_synapse(w = 3.0, pre = catchfirst0, post = out0)
+	synapses += [s,c]
 
-	#add some noise to the output node out0
-	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
-	out0.add_synapse(syn=[noise])
-
-
-	#generate neuron with in1 as input and out1 as output
-	n = Izh_Neuron( syn_in=[in1] )
+catchsecond0 = Izh_Neuron()
+nodes.append(catchsecond0)
+for i in xrange(20):
+        n = Izh_Neuron( syn_in=[in1] )
 	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = 1.8,pre=n,post= out1 )
+	s = Neuronal_synapse(w = -3.0,pre=n,post= catchsecond0 )
 	#add node to lyr:
-	lyr += [n]
-
-	#add some noise to the output node out1
-	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
-	out0.add_synapse(syn=[noise])
-
-nodes += lyr
+	nodes += [n]
+	synapses += [s]
+        c = Continuous_synapse(w = 0.5)
+	catchsecond0.add_synapse([c])
+        s = Neuronal_synapse(w = 3.0, pre = catchsecond0, post = out1)
+	synapses += [s,c]
 ## END OF EXAMPLE 2
 
 
