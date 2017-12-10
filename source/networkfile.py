@@ -44,55 +44,42 @@ For a cheatsheet of how to define neuron/synapse types and functions, see below
 ## EXAMPLE 2:
 #generate 20 Izh neurons:
 inp = [in0, in1]
-catchsingle = [[],[]]
-catchdouble = [[],[]]
+catchsingle = [[LIF_Neuron(), LIF_Neuron()],[LIF_Neuron(), LIF_Neuron()]]
+catchdouble = [[Izh_Neuron(), Izh_Neuron()],[Izh_Neuron(), Izh_Neuron()]]
 outp = [out0, out1]
 
-catch00 = Izh_Neuron()
-nodes.append(catch00)
 #catch00.set_record(name='00', record = True)
+for i in [(0,0),(0,1),(1,0),(1,1)]:
+	#catchsingle[0][0].set_record(name='c0', record = True)
+	if i[1] == 0:
+		c = Continuous_synapse(w = 3.0, onset = 300)
+		catchsingle[i[0]][i[1]].add_synapse([c])
+		synapses.append(c)
+	for i in xrange(100):
+		n = Izh_Neuron( syn_in=[inp[i[0]]] )
+		s = Neuronal_synapse(w = 0.5 * (-1)**(i[1]+1),pre=n,post= catchsingle[i[0]][i[1]] )
+		#if i == 1:
+		#	n.set_record(name='inhibfirst', record=True) # name is not important
+		#	s.set_record(name = 'inh0', record = True)
+		#add node to lyr:
+		nodes += [n]
+		synapses += [s]
+	if i[0] == 0:
+		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][0])
+		synapses += [s]
+		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][1])
+		synapses += [s]
+	if i[0] == 1:
+		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[0][i[1]])
+		synapses += [s]
+		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1][i[1]])
+		synapses += [s]
 
-catchfirst0 = LIF_Neuron()
-nodes.append(catchfirst0)
-catchfirst0.set_record(name='c0', record = True)
-c = Continuous_synapse(w = 3.0, onset = 300)
-catchfirst0.add_synapse([c])
-synapses.append(c)
-for i in xrange(100):
-        n = Izh_Neuron( syn_in=[in0] )
-	s = Neuronal_synapse(w = -0.5,pre=n,post= catchfirst0 )
- 	if i == 1:
-		n.set_record(name='inhibfirst', record=True) # name is not important
-		s.set_record(name = 'inh0', record = True)
-	#add node to lyr:
-	nodes += [n]
+for i in [(0,0),(0,1),(1,0),(1,1)]:
+	s = Neuronal_synapse(w = 3.5, pre = catchdouble[i[0]][i[1]], post = outp[(i[0] + i[1])%2])
 	synapses += [s]
-
-s = Neuronal_synapse(w = 7.0, pre = catchfirst0, post = catch00)
-synapses += [s]
-s = Neuronal_synapse(w = 3.5, pre = catch00, post = out0)
-synapses += [s]
-
-catchsecond0 = LIF_Neuron()
-nodes.append(catchsecond0)
-catchsecond0.set_record(name='c1', record = True)
-c = Continuous_synapse(w = 3.0, onset = 300)
-catchsecond0.add_synapse([c])
-synapses.append(c)
-for i in xrange(100):
-        n = Izh_Neuron( syn_in=[in1] )
-	s = Neuronal_synapse(w = -0.5,pre=n,post= catchsecond0 )
-	if i == 1:
-		n.set_record(name='inhibsecond', record=True) # name is not important
-		s.set_record(name = 'inh1', record = True)
-	#add node to lyr:
-	nodes += [n]
-	synapses += [s]
-
-s = Neuronal_synapse(w = 7.0, pre = catchsecond0, post = catch00)
-synapses += [s]
-
-
+nodes += sum(catchsingle, [])
+nodes += sum(catchdouble, [])
 #out0.set_record(name='out0', record=True)
 #out1.set_record(name='out1', record=True)
 ## END OF EXAMPLE 2
