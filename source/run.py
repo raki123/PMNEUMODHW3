@@ -6,5 +6,5 @@ with open('networkfile.py') as nwsfile:
 for i in range(10):
 	net = Network(nws)
 	desc, rt = net.simulate()
-	#net.make_plots(trace=False, im = True, tmax=rt)
+	net.make_plots(trace=True, im = True, tmax=rt)
 	print desc, rt

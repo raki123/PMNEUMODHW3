@@ -102,7 +102,7 @@ class LIF_Neuron(Neuron):
 		
 		# scaled input, so 'responsivenes' matches
 		I = self.I_in() * self.S
-
+		#print I
 		# Update Vm; the following corresponds to [v' = I + a - bv]
 		self.Vm += dt * (I - (self.Vm - self.V_rest) / self.tau_m  )
 

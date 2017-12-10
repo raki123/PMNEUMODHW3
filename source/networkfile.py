@@ -43,33 +43,58 @@ For a cheatsheet of how to define neuron/synapse types and functions, see below
 
 ## EXAMPLE 2:
 #generate 20 Izh neurons:
-catchfirst0 = Izh_Neuron()
-nodes.append(catchfirst0)
-for i in xrange(20):
-        n = Izh_Neuron( syn_in=[in0] )
-	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = -3.0,pre=n,post= catchfirst0 )
-	#add node to lyr:
-	nodes += [n]
-	synapses += [s]
-        c = Continuous_synapse(w = 0.5)
-	catchfirst0.add_synapse([c])
-        s = Neuronal_synapse(w = 3.0, pre = catchfirst0, post = out0)
-	synapses += [s,c]
+inp = [in0, in1]
+catchsingle = [[],[]]
+catchdouble = [[],[]]
+outp = [out0, out1]
 
-catchsecond0 = Izh_Neuron()
-nodes.append(catchsecond0)
-for i in xrange(20):
-        n = Izh_Neuron( syn_in=[in1] )
-	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = -3.0,pre=n,post= catchsecond0 )
+catch00 = Izh_Neuron()
+nodes.append(catch00)
+#catch00.set_record(name='00', record = True)
+
+catchfirst0 = LIF_Neuron()
+nodes.append(catchfirst0)
+catchfirst0.set_record(name='c0', record = True)
+c = Continuous_synapse(w = 3.0, onset = 300)
+catchfirst0.add_synapse([c])
+synapses.append(c)
+for i in xrange(100):
+        n = Izh_Neuron( syn_in=[in0] )
+	s = Neuronal_synapse(w = -0.5,pre=n,post= catchfirst0 )
+ 	if i == 1:
+		n.set_record(name='inhibfirst', record=True) # name is not important
+		s.set_record(name = 'inh0', record = True)
 	#add node to lyr:
 	nodes += [n]
 	synapses += [s]
-        c = Continuous_synapse(w = 0.5)
-	catchsecond0.add_synapse([c])
-        s = Neuronal_synapse(w = 3.0, pre = catchsecond0, post = out1)
-	synapses += [s,c]
+
+s = Neuronal_synapse(w = 7.0, pre = catchfirst0, post = catch00)
+synapses += [s]
+s = Neuronal_synapse(w = 3.5, pre = catch00, post = out0)
+synapses += [s]
+
+catchsecond0 = LIF_Neuron()
+nodes.append(catchsecond0)
+catchsecond0.set_record(name='c1', record = True)
+c = Continuous_synapse(w = 3.0, onset = 300)
+catchsecond0.add_synapse([c])
+synapses.append(c)
+for i in xrange(100):
+        n = Izh_Neuron( syn_in=[in1] )
+	s = Neuronal_synapse(w = -0.5,pre=n,post= catchsecond0 )
+	if i == 1:
+		n.set_record(name='inhibsecond', record=True) # name is not important
+		s.set_record(name = 'inh1', record = True)
+	#add node to lyr:
+	nodes += [n]
+	synapses += [s]
+
+s = Neuronal_synapse(w = 7.0, pre = catchsecond0, post = catch00)
+synapses += [s]
+
+
+#out0.set_record(name='out0', record=True)
+#out1.set_record(name='out1', record=True)
 ## END OF EXAMPLE 2
 
 
