@@ -33,8 +33,9 @@ class Network(object):
 		########## 1. input synapses / one is stimulated, other isn't ##########
 		# Input pattern:
 		self.patt_in = np.array( [randint(0,1), randint(0,1)] )
+		#self.patt_in = np.array( [0,0] )
 
-                print self.patt_in
+                #print self.patt_in
 		## perceptual descision making: does the input match the output?
 		if rand_input:
 			np.random.shuffle( self.patt_in )

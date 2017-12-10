@@ -19,70 +19,94 @@ So, the input synapses and the output nodes are already listed and accessible
 
 For a cheatsheet of how to define neuron/synapse types and functions, see below
 """
-
-### EXAMPLE 1 :
-##define neurons;
-#a = Izh_Neuron()
-#b = Izh_Neuron(izh_type = 'C')
-#
-## define a synapse;
-#syn_ab = Neuronal_synapse(w = 3.5, pre = a, post = [b])
-#
-## We want to see the neuron's behavior:
-#a.set_record('Neuron A - Izh type A')
-#b.set_record('Neuron B - Izh type C')
-## and what is happening at the output of interest:
-#out0.set_record('Output 0')
-#out1.set_record('Output 1')
-#
-#
-## add them to the nodes/synapses
-#nodes += [a,b]
-#synapses += [syn_ab]
-### END OF EXAMPLE 1
-
-## EXAMPLE 2:
-#generate 20 Izh neurons:
+### XOR Solving network
+# the input synapses gathered in a list to make indexing possible
 inp = [in0, in1]
+
+# a layer of neurons which should each detect if one of the inputs is zero or one
+# the neuron at index i,j should fire if the input with index i is equal to j
 catchsingle = [[LIF_Neuron(), LIF_Neuron()],[LIF_Neuron(), LIF_Neuron()]]
-catchdouble = [[Izh_Neuron(), Izh_Neuron()],[Izh_Neuron(), Izh_Neuron()]]
+
+# a layer of neurons which should detect one of the possible input pairs
+# the neuron at index i,j should fire if the input is equal to i,j
+catchdouble = [[LIF_Neuron(), LIF_Neuron()],[LIF_Neuron(), LIF_Neuron()]]
+
+#catchdouble = [[Izh_Neuron(), Izh_Neuron()],[Izh_Neuron(), Izh_Neuron()]]
+# the output synapses gathered in a list to make indexing possible
 outp = [out0, out1]
 
-#catch00.set_record(name='00', record = True)
 for i in [(0,0),(0,1),(1,0),(1,1)]:
-	#catchsingle[0][0].set_record(name='c0', record = True)
+	# debug statement to see how well the single input recognition works
+	# catchsingle[i[0]][i[1]].set_record(name='c'+str(i), record = True)
+
 	if i[1] == 0:
-		c = Continuous_synapse(w = 3.0, onset = 300)
+		# as far as i know there isnt a possibility to say if you do not get any input current then fire otherwise do not fire
+		# instead when detecting a zero as input one can give the neuron some input current which is always present (or rather present when there is a stimulus)
+		# this input current is then decreased by inhibiting neural connections if a one is present as input
+		c = Poisson_synapse(firing_rate=0.75, w = 2.0, onset = 300)
 		catchsingle[i[0]][i[1]].add_synapse([c])
 		synapses.append(c)
-	for i in xrange(100):
+
+	
+	for x in xrange(50):
 		n = Izh_Neuron( syn_in=[inp[i[0]]] )
-		s = Neuronal_synapse(w = 0.5 * (-1)**(i[1]+1),pre=n,post= catchsingle[i[0]][i[1]] )
-		#if i == 1:
-		#	n.set_record(name='inhibfirst', record=True) # name is not important
-		#	s.set_record(name = 'inh0', record = True)
-		#add node to lyr:
+		# add neurons which excite neurons responsible for detecting ones as input if they find a one 
+		# or if the neuron is responsible for detecting a zero as input it receives an inhibiting signal from this neuron
+		# this is handled by the sign of the weight of the neural synapse created here
+		s = Neuronal_synapse(w = 1.0 * (-1)**(i[1]+1),pre=n,post= catchsingle[i[0]][i[1]] )
 		nodes += [n]
 		synapses += [s]
+
+		# debug statement to see when the neurons are firing and what the output current is
+		#if i == 1:
+		#	n.set_record(name='spiking'+str(i), record=True) # name is not important
+		#	s.set_record(name = 'outp_current'+str(i), record = True)
+
+	# if we know which single digits are present we can derive which digit is present overall
+	# if we know the first digit is a 0 the whole input can only be 0,0 or 0,1 -> add synapses which excite the corresponding neurons
+	# furthermore if we know the first digit is a 0 the whole input can not be 1,0 or 1,1 -> add synapses which inhibit the corresponding neurons
 	if i[0] == 0:
-		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][0])
+		s = Neuronal_synapse(w = 10.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][0])
 		synapses += [s]
-		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][1])
+		s = Neuronal_synapse(w = 10.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[i[1]][1])
+		synapses += [s]
+		s = Neuronal_synapse(w = -15.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1-i[1]][0])
+		synapses += [s]
+		s = Neuronal_synapse(w = -15.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1-i[1]][1])
 		synapses += [s]
 	if i[0] == 1:
-		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[0][i[1]])
+		s = Neuronal_synapse(w = 10.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[0][i[1]])
 		synapses += [s]
-		s = Neuronal_synapse(w = 7.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1][i[1]])
+		s = Neuronal_synapse(w = 10.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1][i[1]])
+		synapses += [s]
+		s = Neuronal_synapse(w = -15.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[0][1-i[1]])
+		synapses += [s]
+		s = Neuronal_synapse(w = -15.0, pre = catchsingle[i[0]][i[1]], post = catchdouble[1][1-i[1]])
 		synapses += [s]
 
+# connect neurons which recongnize the different inputs to the corresponding outputs 0,0 to 0, 1,1 to 0 etc.
 for i in [(0,0),(0,1),(1,0),(1,1)]:
-	s = Neuronal_synapse(w = 3.5, pre = catchdouble[i[0]][i[1]], post = outp[(i[0] + i[1])%2])
+	s = Neuronal_synapse(w = 10.0, pre = catchdouble[i[0]][i[1]], post = outp[(i[0] + i[1])%2])
 	synapses += [s]
+	# s = Neuronal_synapse(w = -3.0, pre = catchdouble[i[0]][i[1]], post = outp[(i[0] + i[1]+1)%2])
+	# synapses += [s]
+
+	# debug statement to see how well input detection is working
+	# catchdouble[i[0]][i[1]].set_record(name=str(i), record = True)
+
+# suppress random current reaching the output neurons by inhibiting before stimulus onset
+for i in [0,1]:
+	c = Poisson_synapse(w = -2.0, onset = 0, offset = 300)
+	outp[i].add_synapse([c])
+	synapses.append(c)
+
+# add all neurons which were not added before
 nodes += sum(catchsingle, [])
 nodes += sum(catchdouble, [])
-#out0.set_record(name='out0', record=True)
-#out1.set_record(name='out1', record=True)
-## END OF EXAMPLE 2
+
+# debug statement showing how well the decision making process works overall/how close a decision was
+# out0.set_record(name='out0', record=True)
+# out1.set_record(name='out1', record=True)
 
 
 """
