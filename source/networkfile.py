@@ -48,29 +48,11 @@ for i in xrange(20):
 	# generate neuron ... with in0 as input and out0 as output
 	n = Izh_Neuron( syn_in=[in0] )
 	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = 1.8,pre=n,post= out0 )
+	s = Neuronal_synapse(w = 2.0,pre=n,post= out0 )
 	#add node to lyr:
 	lyr += [n]
 	synapses += [s]
 
-	#add some noise to the output node out0
-	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
-	out0.add_synapse(syn=[noise])
-	synapses += [noise]
-
-
-	#generate neuron with in1 as input and out1 as output
-	n = Izh_Neuron( syn_in=[in1] )
-	n.set_record(name='', record=False) # name is not important
-	s = Neuronal_synapse(w = 1.8,pre=n,post= out1 )
-	#add node to lyr:
-	lyr += [n]
-	synapses += [s]
-
-	#add some noise to the output node out1
-	noise = Poisson_synapse(firing_rate = 0.1, w = 0.14, onset = 300)
-	out0.add_synapse(syn=[noise])
-	synapses += [noise]
 
 nodes += lyr
 ## END OF EXAMPLE 2

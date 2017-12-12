@@ -21,7 +21,7 @@ class Network(object):
 	"""This contains a bunch of neurons and synapses, and should eventually 
 	result in a perceptual descision
 	"""
-	def __init__(self, network_spec="", T=5000, dt=1.0, rand_input=True):
+	def __init__(self, network_spec="", T=5000, dt=1.0, rand_input=False):
 		super(Network, self).__init__()
 		"""
 		Code for the network architecture:
